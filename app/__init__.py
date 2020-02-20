@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_admin import Admin
 from flask_login import LoginManager
+from flask_mail import Mail
 from config import Config
 import os
 
@@ -15,6 +16,7 @@ bcrypt = Bcrypt()
 jwt = JWTManager()
 admin = Admin(base_template="my_master.html")
 login = LoginManager()
+mail = Mail()
 
 
 def create_app(config=Config):
@@ -30,6 +32,7 @@ def create_app(config=Config):
     bcrypt.init_app(app)
     jwt.init_app(app)
     login.init_app(app)
+    mail.init_app(app)
 
     from app.user_admin import CustomIndexView
     admin.init_app(

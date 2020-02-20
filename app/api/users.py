@@ -18,9 +18,12 @@ parser.add_argument('bank_account_num', type=str)
 parser.add_argument('bank_account_name', type=str)
 parser.add_argument('role', type=str)
 parser.add_argument('admin', type=bool)
+parser.add_argument('first_name', type=str)
+parser.add_argument('last_name', type=str)
+parser.add_argument('id_num', type=int)
 
 class Users(Resource):
-    @jwt_required    
+    @jwt_required
     @admin_required
     def post(self):
         args = parser.parse_args()
@@ -32,13 +35,16 @@ class Users(Resource):
         admin = args['admin']
 
         user = User(
-            email=email, 
+            email=email,
             bank_name=bank_name,
             bank_account_num=bank_account_num,
             role=role,
             bank_account_name=bank_account_name,
             admin=admin
         )
+
+
+
         db.session.add(user)
         db.session.commit()
         uri = url_for('one-acre.user', id=user.id, _external=True)
@@ -52,7 +58,7 @@ class Users(Resource):
 
         return output, 201, {'Location': uri}
 
-    @jwt_required    
+    @jwt_required
     @admin_required
     def get(self, id=None):
         # Return user data
@@ -81,7 +87,7 @@ class Users(Resource):
 
         return output
 
-    @jwt_required    
+    @jwt_required
     def patch(self, id, field):
 
         if not id.isnumeric():
@@ -99,7 +105,7 @@ class Users(Resource):
         if not id.isnumeric():
             return raise_error(400, "User ID should be an integer")
         if field not in ('bank_name', 'bank_account_num', 'bank_account_name',
-                         'role','admin', 'email'):
+                         'role','admin', 'email', 'first_name', 'last_name', 'id_num'):
             return raise_error(400, "Invalid field name")
 
         parser = reqparse.RequestParser()
@@ -118,6 +124,13 @@ class Users(Resource):
 
         if not user:
             return raise_error(404, "User does not exist")
+        if field == 'first_name':
+            user.first_name = new_field_value
+        if field == 'last_name':
+            user.last_name = new_field_value
+        if field == 'id_num':
+            new_field_value = int(new_field_value)
+            user.id_num = new_field_value
         if field == 'bank_name':
             user.bank_name = new_field_value
         if field == 'bank_account_num':

@@ -19,6 +19,9 @@ class Config(object):
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     PROPAGATE_EXCEPTIONS = True
 
+    # sendrig -  email
+    SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+
     # Flask-admin
     FLASK_ADMIN_SWATCH = 'cerulean'
 

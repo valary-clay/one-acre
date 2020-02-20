@@ -20,9 +20,10 @@ from app.helpers import (
 )
 from .common.utils import (valid_email, valid_password, valid_role)
 from .common.errors import raise_error
+from app.helpers import send_email
 
 parser = reqparse.RequestParser()
-parser.add_argument('email', type=str) 
+parser.add_argument('email', type=str)
 parser.add_argument('password', type=str)
 parser.add_argument('role', type=str)
 
@@ -31,8 +32,8 @@ class SignUP(Resource):
     def post(self):
         args = parser.parse_args()
         email = args.get('email')
-        password = args.get('password') 
-        role = args.get('role') 
+        password = args.get('password')
+        role = args.get('role')
 
         if email is None:
             return raise_error(400, "Email is missing")
@@ -99,7 +100,7 @@ class SignIn(Resource):
         user = User.query.filter_by(email=email).first()
         if user is None or not user.check_password(password):
             return raise_error(401, "Bad email or password")
-        
+
         # Create our JWTs
         access_token = create_access_token(identity=email)
         refresh_token = create_refresh_token(identity=email)

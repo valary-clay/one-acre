@@ -22,6 +22,9 @@ class UserAdmin(sqla.ModelView):
 
     column_list = [
         'email',
+        'first_name',
+        'last_name',
+        'id_num',
         'bank_name',
         'bank_account_num',
         'bank_account_name',

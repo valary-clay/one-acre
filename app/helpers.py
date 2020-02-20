@@ -10,17 +10,22 @@ from datetime import datetime
 from flask_jwt_extended import decode_token
 from sqlalchemy.orm.exc import NoResultFound
 
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
 
 from .exceptions import TokenNotFound
 from .models import TokenBlacklist
 from . import db
+from flask import current_app
+
 
 def _epoch_utc_to_datetime(epoch_utc):
     """
     Helper function for converting epoch timestamps (as stored in JWTs) into
     python datetime objects (which are easier to use with sqlalchemy).
 
-    :param epoch_utc: This param has type timestamp and is coverted to a 
+    :param epoch_utc: This param has type timestamp and is coverted to a
                       datetime object to match the Datetime type in the
                       postgresql database column
     """
@@ -62,7 +67,7 @@ def is_token_revoked(decoded_token):
         return token.revoked
     except NoResultFound:
         return True
-        
+
 def get_user_tokens(user_identity):
     """
     Returns all of the tokens, revoked and unrevoked, that are stored for the
@@ -108,4 +113,14 @@ def prune_database():
         db.session.delete(token)
     db.session.commit()
 
-
+def send_email(subject, sender, recipients, text_body, html_body):
+    msg = Mail(
+        from_email=sender,
+        to_emails=recipients,
+        subject=subject,
+        html_content=html_body,
+        text_content=text_body
+    )
+    mail = SendGridAPIClient(current_app.config['SENDGRID_API_KEY'])
+    response = mail.send(msg)
+    return response
